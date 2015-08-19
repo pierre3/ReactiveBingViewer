@@ -33,10 +33,10 @@ namespace ReactiveBingViewer.Models
         {
             this.logger = logger ?? new EmptyLogger();
 
-            this.imagesSource = new ObservableCollection<WebImage>();
-            this.readonlyImages = new ReadOnlyObservableCollection<WebImage>(this.imagesSource);
+            imagesSource = new ObservableCollection<WebImage>();
+            readonlyImages = new ReadOnlyObservableCollection<WebImage>(this.imagesSource);
 
-            this.bingAccountKey = bingApiAccountKey;
+            bingAccountKey = bingApiAccountKey;
             this.visionApiSubscriptionKey = visionApiSubscriptionKey;
         }
 
@@ -54,7 +54,7 @@ namespace ReactiveBingViewer.Models
         /// </summary>
         public void Clear()
         {
-            this.imagesSource.Clear();
+            imagesSource.Clear();
         }
 
         /// <summary>
