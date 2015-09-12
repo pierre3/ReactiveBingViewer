@@ -1,0 +1,14 @@
+class EmptyLogger {
+    + Debug(message:string) : void
+    + Debug(message:string, e:Exception) : void
+    + Error(message:string) : void
+    + Error(message:string, e:Exception) : void
+    + Fatal(message:string) : void
+    + Fatal(message:string, e:Exception) : void
+    + Info(message:string) : void
+    + Info(message:string, e:Exception) : void
+    + Trace(message:string) : void
+    + Trace(message:string, e:Exception) : void
+    + Warn(message:string) : void
+    + Warn(message:string, e:Exception) : void
+}

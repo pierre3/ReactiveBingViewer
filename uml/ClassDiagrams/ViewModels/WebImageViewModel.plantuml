@@ -1,0 +1,25 @@
+class WebImageViewModel {
+    - source : WebImage
+    - logger : ILogger
+    - visionApiSubscriptionKey : string
+    - disposables : CompositeDisposable
+    - progress : ProgressNotifier
+    - imageSize : Size
+    + Thumbnail : ReadOnlyReactiveProperty<ImageSource> <<get>>
+    + DisplayImage : ReadOnlyReactiveProperty<ImageSource> <<get>>
+    + Overlay : ReadOnlyReactiveProperty<ImageSource> <<get>>
+    + SourceUrl : ReadOnlyReactiveProperty<string> <<get>>
+    + SourceTitle : ReadOnlyReactiveProperty<string> <<get>>
+    + ImageProperty : ReadOnlyReactiveProperty<ImageProperty> <<get>>
+    + IsProcessing : ReadOnlyReactiveProperty<bool> <<get>>
+    + ProgressVisibility : ReadOnlyReactiveProperty<Visibility> <<get>>
+    + SizeChangedCommand : ReactiveCommand<Size> <<get>>
+    + NavigateCommand : ReactiveCommand <<get>>
+    + WebImageViewModel(source:WebImage, visionApiSubscriptionKey:string, logger:ILogger)
+    + <<async>> DownloadImageDetailsAsync() : Task
+    - <<async>> DownLoadFullImageAsync() : Task
+    - <<async>> AnalyzeImageAsync() : Task
+    + Dispose() : void
+    # <<virtual>> Dispose(disposing:bool) : void
+    - disposed : bool = false
+}

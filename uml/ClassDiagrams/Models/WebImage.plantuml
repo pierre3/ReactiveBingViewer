@@ -1,0 +1,24 @@
+class WebImage {
+    - thumbnail : ImageSource
+    - displayImage : ImageSource
+    - overlay : ImageSource
+    - mediaUrl : Uri
+    - sourceUrl : string
+    - sourceTitle : string
+    - imageProperty : ImageProperty
+    - bingResult : Bing.ImageResult
+    - logger : ILogger
+    + Thumbnail : ImageSource <<get>>
+    + DisplayImage : ImageSource <<get>>
+    + Overlay : ImageSource <<get>>
+    + MediaUrl : Uri <<get>>
+    + SourceUrl : string <<get>>
+    + SourceTitle : string <<get>>
+    + ImageProperty : ImageProperty <<get>>
+    + WebImage(bingResult:Bing.ImageResult, logger:ILogger)
+    + <<async>> DownLoadThumbnailAsync() : Task
+    + <<async>> DownLoadFullImageAsync() : Task
+    + <<async>> AnalyzeImageAsync(subscriptionKey:string) : Task
+    + DrawFaceRect(imageSize:Size) : void
+    - RaisePropertyChanged(name:string) : void
+}

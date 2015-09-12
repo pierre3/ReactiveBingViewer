@@ -1,0 +1,11 @@
+class ProgressNotifier {
+    - workCounter : CountNotifier
+    - progress : ScheduledNotifier<double>
+    + IsProcessingObservable : IObservable<bool> <<get>>
+    + PercentProgressObservable : IObservable<double> <<get>>
+    + ProgressNotifier()
+    + ProgressNotifier(scheduler:IScheduler)
+    + Start() : IDisposable
+    + Progress(percentProgress:double) : void
+    + End() : void
+}

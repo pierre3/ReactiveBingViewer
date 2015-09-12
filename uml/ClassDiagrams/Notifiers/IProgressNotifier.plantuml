@@ -1,0 +1,5 @@
+interface IProgressNotifier {
+    Start() : IDisposable
+    Progress(percentProgress:double) : void
+    End() : void
+}

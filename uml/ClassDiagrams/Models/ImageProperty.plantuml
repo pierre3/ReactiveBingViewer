@@ -1,0 +1,6 @@
+class ImageProperty {
+    + AnalysisData : AnalysisResult <<get>>
+    + MediaUrl : string <<get>>
+    + ImageProperty(sourceUrl:string, source:AnalysisResult)
+    + <<override>> ToString() : string
+}

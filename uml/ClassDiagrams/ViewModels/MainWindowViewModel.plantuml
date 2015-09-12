@@ -1,0 +1,23 @@
+class MainWindowViewModel {
+    - disposables : CompositeDisposable
+    + logger : LogMessageNotifier
+    + progress : ProgressNotifier
+    - webImageStore : WebImageStore
+    + SearchCommand : ReactiveCommand <<get>>
+    + CancelCommand : ReactiveCommand <<get>>
+    + SearchWord : ReactiveProperty<string> <<get>>
+    + Images : ReadOnlyReactiveCollection<WebImageViewModel> <<get>>
+    + SelectedImage : ReactiveProperty<WebImageViewModel> <<get>>
+    + PercentProgress : ReactiveProperty<double> <<get>>
+    + StatusMessage : ReadOnlyReactiveProperty<LogMessage> <<get>>
+    + ErrorLogs : ReadOnlyReactiveCollection<LogMessage> <<get>>
+    + ErrorLogsVisibility : ReactiveProperty<Visibility> <<get>>
+    + ClearErrorLogsCommand : ReactiveCommand <<get>>
+    + MainWindowViewModel()
+    - InitializeSearchBar() : void
+    - InitializeThumnailBar() : void
+    - InitializeStatusBar() : void
+    + Dispose() : void
+    # <<virtual>> Dispose(disposing:bool) : void
+    - disposed : bool = false
+}

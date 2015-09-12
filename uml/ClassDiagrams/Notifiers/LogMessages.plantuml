@@ -1,0 +1,27 @@
+abstract class LogMessage {
+    + CreatedAt : DateTime <<get>>
+    + Message : string <<get>>
+    + Level : LogLevel <<get>>
+    + Exception : Exception <<get>>
+    + HasError : bool <<get>>
+    + LogMessage(message:string, level:LogLevel, e:Exception)
+    + <<override>> ToString() : string
+}
+class TraceLogMessage {
+    + TraceLogMessage(message:string, e:Exception)
+}
+class DebugLogMessage {
+    + DebugLogMessage(message:string, e:Exception)
+}
+class InfoLogMessage {
+    + InfoLogMessage(message:string, e:Exception)
+}
+class WarnLogMessage {
+    + WarnLogMessage(message:string, e:Exception)
+}
+class ErrorLogMessage {
+    + ErrorLogMessage(message:string, e:Exception)
+}
+class FatalLogMessage {
+    + FatalLogMessage(message:string, e:Exception)
+}

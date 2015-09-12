@@ -1,0 +1,15 @@
+class LogLevel <<struct>> {
+    + {static} <<readonly>> Trace : LogLevel
+    + {static} <<readonly>> Debug : LogLevel
+    + {static} <<readonly>> Info : LogLevel
+    + {static} <<readonly>> Warn : LogLevel
+    + {static} <<readonly>> Error : LogLevel
+    + {static} <<readonly>> Fatal : LogLevel
+    + Name : string <<get>>
+    + Level : int <<get>>
+    + LogLevel(name:string, level:int)
+    + Equals(other:LogLevel) : bool
+    + CompareTo(other:LogLevel) : int
+    + <<override>> GetHashCode() : int
+    + <<override>> Equals(obj:object) : bool
+}

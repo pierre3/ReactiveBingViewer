@@ -1,0 +1,16 @@
+class WebImageStore {
+    - imagesSource : ObservableCollection<WebImage>
+    - readonlyImages : ReadOnlyObservableCollection<WebImage>
+    - disposable : IDisposable
+    - bingAccountKey : string
+    - visionApiSubscriptionKey : string
+    - logger : ILogger
+    + Images : ReadOnlyObservableCollection<WebImage> <<get>>
+    + WebImageStore(bingApiAccountKey:string, visionApiSubscriptionKey:string, logger:ILogger)
+    + Cancel() : void
+    + Clear() : void
+    + DownloadWebImage(searchWord:string, progress:IProgressNotifier) : void
+    + Dispose() : void
+    # <<virtual>> Dispose(disposing:bool) : void
+    - disposed : bool = false
+}
