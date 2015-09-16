@@ -5,11 +5,13 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Reactive.Linq;
-using System.Threading.Tasks;
-using System.Windows.Media.Imaging;
-using System.Reactive.Threading.Tasks;
 using System.Reactive.Concurrency;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace ReactiveBingViewer.Models
 {
@@ -32,7 +34,10 @@ namespace ReactiveBingViewer.Models
             bing.Credentials = new NetworkCredential("accountKey", accountKey);
             try
             {
-                var result = bing.Image(searchWord, null, null, null, null, null, null, skip, top).Execute();
+                var query = bing.Image(searchWord, null, null, null, null, null, null);
+                query.AddQueryOption("$skip", skip);
+                query.AddQueryOption("$top", top);
+                var result = query.Execute();
                 return result.ToObservable();
             }
             catch (Exception e)
@@ -64,7 +69,8 @@ namespace ReactiveBingViewer.Models
                 var bytes = await web.GetByteArrayAsync(url).ConfigureAwait(false);
                 using (var stream = new WrappingStream(new MemoryStream(bytes)))
                 {
-                    return await CreateBitmap(stream, Reactive.Bindings.UIDispatcherScheduler.Default);
+                    //return await CreateBitmap(stream,  Reactive.Bindings.UIDispatcherScheduler.Default);
+                    return CreateBitmap(stream, Application.Current.Dispatcher);
                 }
             }
         }
@@ -84,10 +90,23 @@ namespace ReactiveBingViewer.Models
                 bitmap.StreamSource = stream;
                 bitmap.CacheOption = BitmapCacheOption.OnLoad;
                 bitmap.EndInit();
-                //bitmap.Freeze();
+                bitmap.Freeze();
                 return bitmap;
             }, scheduler).ToTask();
         }
 
+        public static BitmapImage CreateBitmap(Stream stream, Dispatcher dispatcher)
+        {
+            return dispatcher.Invoke(new Func<Stream,BitmapImage>((st) =>
+            {
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.StreamSource = st;
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.EndInit();
+                bitmap.Freeze();
+                return bitmap;
+            }), stream) as BitmapImage;
+        }
     }
 }

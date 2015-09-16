@@ -782,16 +782,14 @@ namespace Bing {
         /// <param name="Latitude">Latitude Sample Values : 47.603450</param>
         /// <param name="Longitude">Longitude Sample Values : -122.329696</param>
         /// <param name="ImageFilters">Array of strings that filter the response the API sends based on size, aspect, color, style, face or any combination thereof. Valid values are: Size:Small, Size:Medium, Size:Large, Size:Width:[Width], Size:Height:[Height], Aspect:Square, Aspect:Wide, Aspect:Tall, Color:Color, Color:Monochrome, Style:Photo, Style:Graphics, Face:Face, Face:Portrait, Face:Other. Sample Values : Size:Small+Aspect:Square</param>
-        public DataServiceQuery<ImageResult> Image(String Query,String Options, String Market, String Adult, Double? Latitude, Double? Longitude, String ImageFilters,
-            int skip=0, int top=50) {
+        public DataServiceQuery<ImageResult> Image(String Query,String Options, String Market, String Adult, Double? Latitude, Double? Longitude, String ImageFilters) {
             if ((Query == null)) {
                 throw new System.ArgumentNullException("Query", "Query value cannot be null");
             }
             DataServiceQuery<ImageResult> query;
             query = base.CreateQuery<ImageResult>("Image");
             if ((Query != null)) {
-                query = query.AddQueryOption("Query", string.Concat("\'", System.Uri.EscapeDataString(Query), "\'",
-                    "&$skip="+skip,"&$top="+top));
+                query = query.AddQueryOption("Query", string.Concat("\'", System.Uri.EscapeDataString(Query), "\'"));
             }
             if ((Options != null)) {
                 query = query.AddQueryOption("Options", string.Concat("\'", System.Uri.EscapeDataString(Options), "\'"));
