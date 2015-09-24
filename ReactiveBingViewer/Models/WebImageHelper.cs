@@ -35,8 +35,8 @@ namespace ReactiveBingViewer.Models
             try
             {
                 var query = bing.Image(searchWord, null, null, null, null, null, null);
-                query.AddQueryOption("$skip", skip);
-                query.AddQueryOption("$top", top);
+                query = query.AddQueryOption("$skip", skip);
+                query = query.AddQueryOption("$top", top);
                 var result = query.Execute();
                 return result.ToObservable();
             }
@@ -69,8 +69,8 @@ namespace ReactiveBingViewer.Models
                 var bytes = await web.GetByteArrayAsync(url).ConfigureAwait(false);
                 using (var stream = new WrappingStream(new MemoryStream(bytes)))
                 {
-                    //return await CreateBitmap(stream,  Reactive.Bindings.UIDispatcherScheduler.Default);
-                    return CreateBitmap(stream, Application.Current.Dispatcher);
+                    return await CreateBitmap(stream,  Reactive.Bindings.UIDispatcherScheduler.Default);
+                    //return CreateBitmap(stream, Application.Current.Dispatcher);
                 }
             }
         }

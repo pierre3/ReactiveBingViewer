@@ -133,21 +133,9 @@ namespace ReactiveBingViewer.ViewModels
 
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            disposables.Dispose();
         }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposed) { return; }
-            if (disposing)
-            {
-                disposables.Dispose();
-            }
-            disposed = true;
-        }
-        private bool disposed = false;
-
+        
     }
 
 }

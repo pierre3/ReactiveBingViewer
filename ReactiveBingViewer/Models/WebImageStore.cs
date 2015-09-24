@@ -63,19 +63,23 @@ namespace ReactiveBingViewer.Models
         /// </summary>
         /// <param name="searchWord">検索文字列</param>
         /// <param name="progress">進捗状態通知オブジェクト</param>
-        public void DownloadWebImage(string searchWord, IProgressNotifier progress)
+        public void DownloadWebImage(string searchWord, IProgressNotifier progress, int page, int imageCountPerPage)
         {
+            if(imageCountPerPage < 10)
+            {
+                throw new ArgumentException(nameof(imageCountPerPage) +" must be 10 or over.", nameof(imageCountPerPage));
+            }
+
             logger.Info("検索中...");
             progress.Start();
             progress.Progress(0);
 
-            var skip = 0;
-            var count = 50;
+            var skip = (page - 1) * imageCountPerPage;
 
-            disposable = WebImageHelper.SearchImageAsObservable(searchWord, bingAccountKey, skip, count)
+            disposable = WebImageHelper.SearchImageAsObservable(searchWord, bingAccountKey, skip, imageCountPerPage)
                 .SelectMany(async bingResult =>
                 {
-                    var image = new WebImage(bingResult,logger);
+                    var image = new WebImage(bingResult, logger);
                     try
                     {
                         await image.DownLoadThumbnailAsync();
@@ -87,21 +91,21 @@ namespace ReactiveBingViewer.Models
                         return null;
                     }
                 })
-                .Select((image, n) => new { image, percentProgress = (double)(n+1)/count * 100 })
+                .Select((image, index) => new { image, index })
                 .Where(a => a.image != null)
-                .Finally(()=>progress.End())
+                .Finally(() => progress.End())
                 .Subscribe(
                     onNext: a =>
                     {
                         imagesSource.Add(a.image);
-                        progress.Progress(a.percentProgress);
+                        progress.Progress((double)(a.index + 1) / imageCountPerPage * 100);
                     },
                     onError: e =>
                     {
-                        logger.Error("画像の検索に失敗しました。",e);
+                        logger.Error("画像の検索に失敗しました。", e);
                     },
                     onCompleted: () =>
-                    {   
+                    {
                         logger.Info("検索が完了しました。");
                         progress.Progress(100);
                     });
@@ -112,22 +116,9 @@ namespace ReactiveBingViewer.Models
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            Cancel();
+            Clear();
         }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposed) { return; }
-
-            if (disposing)
-            {
-                Cancel();
-                Clear();
-            }
-            disposed = true;
-        }
-
-        private bool disposed = false;
+        
     }
 }

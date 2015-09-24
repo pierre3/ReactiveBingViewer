@@ -25,6 +25,13 @@
             </TextBox>
             <Button Padding="8,2" Margin="4,2" Command="{Binding SearchCommand}">検索</Button>
             <Button Padding="8,2" Margin="8,2" Command="{Binding CancelCommand}">キャンセル</Button>
+            <TextBlock Padding="8,2" Margin="2,2,0,2">Page:</TextBlock>
+            <Button Padding="8,2" Margin="2,2" Command="{Binding HeadPageCommand}">&lt;&lt;</Button>
+            <Button Padding="8,2" Margin="2,2" Command="{Binding PrevPageCommand}">&lt;</Button>
+            <TextBox Padding="4,2" Margin="2,2"  Text="{Binding PageNumber.Value,Mode=TwoWay}"/>
+            <Button Padding="8,2" Margin="2,2"  Command="{Binding NextPageCommand}">&gt;</Button>
+            <Button Padding="8,2" Margin="2,2"  Command="{Binding TailPageCommand}">&gt;&gt;</Button>
+
         </StackPanel>
 
         <!-- サムネイルバー -->
@@ -94,7 +101,7 @@
                 </i:Interaction.Triggers>
             </Image>
             <Image Grid.Column="0" Source="{Binding Overlay.Value}"/>
-            
+
             <!-- プロパティ -->
             <Rectangle Grid.Column="1" Stroke="SteelBlue" />
             <Grid Grid.Column="1">
