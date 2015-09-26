@@ -9,8 +9,6 @@ class WebImageStore {
     + WebImageStore(bingApiAccountKey:string, visionApiSubscriptionKey:string, logger:ILogger)
     + Cancel() : void
     + Clear() : void
-    + DownloadWebImage(searchWord:string, progress:IProgressNotifier) : void
+    + DownloadWebImage(searchWord:string, progress:IProgressNotifier, page:int, imageCountPerPage:int) : void
     + Dispose() : void
-    # <<virtual>> Dispose(disposing:bool) : void
-    - disposed : bool = false
 }

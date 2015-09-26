@@ -1,4 +1,6 @@
 class MainWindowViewModel {
+    - {static} <<readonly>> maxResultCount : int = 1000
+    - {static} <<readonly>> imageCountPerPage : int = 50
     - disposables : CompositeDisposable
     + logger : LogMessageNotifier
     + progress : ProgressNotifier
@@ -13,11 +15,15 @@ class MainWindowViewModel {
     + ErrorLogs : ReadOnlyReactiveCollection<LogMessage> <<get>>
     + ErrorLogsVisibility : ReactiveProperty<Visibility> <<get>>
     + ClearErrorLogsCommand : ReactiveCommand <<get>>
+    + PageNumber : ReactiveProperty<int> <<get>>
+    + PrevPageCommand : ReactiveCommand <<get>>
+    + NextPageCommand : ReactiveCommand <<get>>
+    + HeadPageCommand : ReactiveCommand <<get>>
+    + TailPageCommand : ReactiveCommand <<get>>
     + MainWindowViewModel()
     - InitializeSearchBar() : void
     - InitializeThumnailBar() : void
     - InitializeStatusBar() : void
+    - SearchImage() : void
     + Dispose() : void
-    # <<virtual>> Dispose(disposing:bool) : void
-    - disposed : bool = false
 }

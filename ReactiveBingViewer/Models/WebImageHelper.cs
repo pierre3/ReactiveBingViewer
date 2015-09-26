@@ -18,7 +18,7 @@ namespace ReactiveBingViewer.Models
     /// <summary>
     /// WebImage 用 ヘルパークラス
     /// </summary>
-    internal class WebImageHelper
+    internal static class WebImageHelper
     {
         /// <summary>
         /// Bing 画像検索を行い、取得した画像URLのシーケンスをIObservableとして返却します
@@ -58,19 +58,43 @@ namespace ReactiveBingViewer.Models
         }
 
         /// <summary>
-        /// Webから画像データをダウンロードしてBitmapImageを作成します
+        /// Webから画像データをダウンロードしてBitmapImageを作成します。
         /// </summary>
+        /// <remarks>
+        /// 指定したSchedulerを使用してBitmapImageを生成します。
+        /// </remarks>
         /// <param name="url">画像URL</param>
+        /// <param name="scheduler">Scheduler</param>
         /// <returns>BitmapImage</returns>
-        public static async Task<BitmapImage> DownLoadImageAsync(string url)
+        public static async Task<BitmapImage> DownLoadImageAsync(string url, IScheduler scheduler )
         {
             using (var web = new HttpClient())
             {
                 var bytes = await web.GetByteArrayAsync(url).ConfigureAwait(false);
                 using (var stream = new WrappingStream(new MemoryStream(bytes)))
                 {
-                    return await CreateBitmap(stream,  Reactive.Bindings.UIDispatcherScheduler.Default);
-                    //return CreateBitmap(stream, Application.Current.Dispatcher);
+                    return await CreateBitmap(stream,  scheduler);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Webから画像データをダウンロードしてBitmapImageを作成します。
+        /// </summary>
+        /// <remarks>
+        /// 指定したDispatcherを使用してBitmapImageを生成します
+        /// </remarks>
+        /// <param name="url">画像URL</param>
+        /// <param name="dispatcher">dispatcher</param>
+        /// <returns>BitmapImage</returns>
+        public static async Task<BitmapImage> DownLoadImageAsync(string url, Dispatcher dispatcher )
+        {
+            using (var web = new HttpClient())
+            {
+                var bytes = await web.GetByteArrayAsync(url).ConfigureAwait(false);
+                using (var stream = new WrappingStream(new MemoryStream(bytes)))
+                {
+                    return CreateBitmap(stream, dispatcher);
                 }
             }
         }
@@ -85,28 +109,33 @@ namespace ReactiveBingViewer.Models
         {
             return Observable.Start(() =>
             {
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.StreamSource = stream;
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.EndInit();
-                bitmap.Freeze();
-                return bitmap;
+                return CreateBitmapImage(stream);
             }, scheduler).ToTask();
         }
 
+        /// <summary>
+        /// 指定したDispatcherを使用して、ストリームからBitmapImageを作成します。
+        /// </summary>
+        /// <param name="stream">ストリーム</param>
+        /// <param name="dispatcher">Dispatcher</param>
+        /// <returns>BitmapImage</returns>
         public static BitmapImage CreateBitmap(Stream stream, Dispatcher dispatcher)
         {
-            return dispatcher.Invoke(new Func<Stream,BitmapImage>((st) =>
+            return dispatcher.Invoke(new Func<Stream, BitmapImage>((st) =>
             {
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.StreamSource = st;
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.EndInit();
-                bitmap.Freeze();
-                return bitmap;
+                return CreateBitmapImage(st);
             }), stream) as BitmapImage;
+        }
+
+        private static BitmapImage CreateBitmapImage(Stream stream )
+        {
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.StreamSource = stream;
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.EndInit();
+            bitmap.Freeze();
+            return bitmap;
         }
     }
 }

@@ -20,6 +20,4 @@ class WebImageViewModel {
     - <<async>> DownLoadFullImageAsync() : Task
     - <<async>> AnalyzeImageAsync() : Task
     + Dispose() : void
-    # <<virtual>> Dispose(disposing:bool) : void
-    - disposed : bool = false
 }

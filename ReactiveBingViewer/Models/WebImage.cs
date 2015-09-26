@@ -1,4 +1,5 @@
-﻿using ReactiveBingViewer.Notifiers;
+﻿using Reactive.Bindings;
+using ReactiveBingViewer.Notifiers;
 using System;
 using System.ComponentModel;
 using System.Globalization;
@@ -133,7 +134,8 @@ namespace ReactiveBingViewer.Models
             logger.Info(string.Format("サムネイル画像をダウンロードしています...[{0}]", this.MediaUrl.AbsoluteUri));
             try
             {
-                this.Thumbnail = await WebImageHelper.DownLoadImageAsync(bingResult.Thumbnail.MediaUrl).ConfigureAwait(false);
+                this.Thumbnail = await WebImageHelper.DownLoadImageAsync(bingResult.Thumbnail.MediaUrl,
+                    Application.Current.Dispatcher).ConfigureAwait(false);
                 logger.Info(string.Format("サムネイル画像のダウンロードが完了しました。[{0}]", this.MediaUrl.AbsoluteUri));
             }
             catch (Exception e)
@@ -152,7 +154,8 @@ namespace ReactiveBingViewer.Models
             logger.Info(string.Format("画像をダウンロードしています...[{0}]", this.MediaUrl.AbsoluteUri));
             try
             {
-                this.DisplayImage = await WebImageHelper.DownLoadImageAsync(this.MediaUrl.AbsoluteUri).ConfigureAwait(false);
+                this.DisplayImage = await WebImageHelper.DownLoadImageAsync(this.MediaUrl.AbsoluteUri,
+                    Application.Current.Dispatcher).ConfigureAwait(false);
                 logger.Info(string.Format("画像のダウンロードが完了しました。[{0}]", this.MediaUrl.AbsoluteUri));
             }
             catch (Exception e)

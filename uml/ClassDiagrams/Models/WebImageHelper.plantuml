@@ -1,6 +1,9 @@
-class WebImageHelper {
+class WebImageHelper <<static>> {
     + {static} SearchImageAsObservable(searchWord:string, accountKey:string, skip:int, top:int) : IObservable<Bing.ImageResult>
     + <<async>> {static} AnalyzeImageAsync(imageUri:Uri, subscriptionKey:string) : Task<AnalysisResult>
-    + {static} <<async>> DownLoadImageAsync(url:string) : Task<BitmapImage>
+    + {static} <<async>> DownLoadImageAsync(url:string, scheduler:IScheduler) : Task<BitmapImage>
+    + {static} <<async>> DownLoadImageAsync(url:string, dispatcher:Dispatcher) : Task<BitmapImage>
     + {static} CreateBitmap(stream:Stream, scheduler:IScheduler) : Task<BitmapImage>
+    + {static} CreateBitmap(stream:Stream, dispatcher:Dispatcher) : BitmapImage
+    - {static} CreateBitmapImage(stream:Stream) : BitmapImage
 }

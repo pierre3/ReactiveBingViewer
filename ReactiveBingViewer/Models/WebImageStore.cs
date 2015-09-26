@@ -63,6 +63,8 @@ namespace ReactiveBingViewer.Models
         /// </summary>
         /// <param name="searchWord">検索文字列</param>
         /// <param name="progress">進捗状態通知オブジェクト</param>
+        /// <param name="page">ページ番号</param>
+        /// <param name="imageCountPerPage">ページ当たりの画像数</param>
         public void DownloadWebImage(string searchWord, IProgressNotifier progress, int page, int imageCountPerPage)
         {
             if(imageCountPerPage < 10)
