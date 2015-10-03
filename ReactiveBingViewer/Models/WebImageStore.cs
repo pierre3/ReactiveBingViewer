@@ -3,6 +3,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 
 namespace ReactiveBingViewer.Models
 {
@@ -65,7 +66,7 @@ namespace ReactiveBingViewer.Models
         /// <param name="progress">進捗状態通知オブジェクト</param>
         /// <param name="page">ページ番号</param>
         /// <param name="imageCountPerPage">ページ当たりの画像数</param>
-        public void DownloadWebImage(string searchWord, IProgressNotifier progress, int page, int imageCountPerPage)
+        public void DownloadSearchResult(string searchWord, IProgressNotifier progress, int page, int imageCountPerPage)
         {
             if(imageCountPerPage < 10)
             {
@@ -79,22 +80,9 @@ namespace ReactiveBingViewer.Models
             var skip = (page - 1) * imageCountPerPage;
 
             disposable = WebImageHelper.SearchImageAsObservable(searchWord, bingAccountKey, skip, imageCountPerPage)
-                .SelectMany(async bingResult =>
-                {
-                    var image = new WebImage(bingResult, logger);
-                    try
-                    {
-                        await image.DownLoadThumbnailAsync();
-                        return image;
-                    }
-                    catch (Exception e)
-                    {
-                        logger.Warn(string.Format("サムネイル画像のダウンロードに失敗しました。[{0}]", bingResult.Thumbnail.MediaUrl), e);
-                        return null;
-                    }
-                })
+                .SelectMany(async bingResult => await CreateWebImageAsync(bingResult))
                 .Select((image, index) => new { image, index })
-                .Where(a => a.image != null)
+                .Where(a => a?.image?.Thumbnail != null)
                 .Finally(() => progress.End())
                 .Subscribe(
                     onNext: a =>
@@ -111,6 +99,14 @@ namespace ReactiveBingViewer.Models
                         logger.Info("検索が完了しました。");
                         progress.Progress(100);
                     });
+        }
+
+
+        private async Task<WebImage> CreateWebImageAsync(Bing.ImageResult bingResult)
+        {
+            var image = new WebImage(bingResult, logger);
+            await image.DownLoadThumbnailAsync();
+            return image;
         }
 
         /// <summary>

@@ -209,7 +209,7 @@ namespace ReactiveBingViewer.ViewModels
         private void SearchImage()
         {
             webImageStore.Clear();
-            webImageStore.DownloadWebImage(SearchWord.Value, progress, PageNumber.Value, imageCountPerPage);
+            webImageStore.DownloadSearchResult(SearchWord.Value, progress, PageNumber.Value, imageCountPerPage);
         }
 
         /// <summary>

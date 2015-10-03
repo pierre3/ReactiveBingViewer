@@ -135,12 +135,13 @@ namespace ReactiveBingViewer.Models
             try
             {
                 this.Thumbnail = await WebImageHelper.DownLoadImageAsync(bingResult.Thumbnail.MediaUrl,
-                    Application.Current.Dispatcher).ConfigureAwait(false);
+                    UIDispatcherScheduler.Default).ConfigureAwait(false);
                 logger.Info(string.Format("サムネイル画像のダウンロードが完了しました。[{0}]", this.MediaUrl.AbsoluteUri));
             }
             catch (Exception e)
             {
                 logger.Warn(string.Format("サムネイル画像のダウンロードに失敗しました。[{0}]", this.MediaUrl.AbsoluteUri), e);
+                this.Thumbnail = null;
             }
         }
 
