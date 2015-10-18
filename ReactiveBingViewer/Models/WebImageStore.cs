@@ -1,8 +1,11 @@
-﻿using ReactiveBingViewer.Notifiers;
+﻿using Reactive.Bindings;
+using ReactiveBingViewer.Notifiers;
 using System;
 using System.Collections.ObjectModel;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 
 namespace ReactiveBingViewer.Models
@@ -68,9 +71,9 @@ namespace ReactiveBingViewer.Models
         /// <param name="imageCountPerPage">ページ当たりの画像数</param>
         public void DownloadSearchResult(string searchWord, IProgressNotifier progress, int page, int imageCountPerPage)
         {
-            if(imageCountPerPage < 10)
+            if (imageCountPerPage < 10)
             {
-                throw new ArgumentException(nameof(imageCountPerPage) +" must be 10 or over.", nameof(imageCountPerPage));
+                throw new ArgumentException(nameof(imageCountPerPage) + " must be 10 or over.", nameof(imageCountPerPage));
             }
 
             logger.Info("検索中...");
@@ -79,15 +82,19 @@ namespace ReactiveBingViewer.Models
 
             var skip = (page - 1) * imageCountPerPage;
 
-            disposable = WebImageHelper.SearchImageAsObservable(searchWord, bingAccountKey, skip, imageCountPerPage)
-                .SelectMany(async bingResult => await CreateWebImageAsync(bingResult))
-                .Select((image, index) => new { image, index })
-                .Where(a => a?.image?.Thumbnail != null)
+            disposable = ServiceClient.SearchImageAsObservable(searchWord, bingAccountKey, skip, imageCountPerPage, ThreadPoolScheduler.Instance)
+                .SelectMany(async imageResult => new {
+                    imageResult,
+                    imageBytes = await DownloadThumbnailImageBytesAsync(imageResult)
+                })
+                .Where(a => a.imageBytes != null)
+                .Select((a,index)=> new{imageResult = a.imageResult, imageBytes = a.imageBytes, index })
+                .ObserveOn(UIDispatcherScheduler.Default)
                 .Finally(() => progress.End())
                 .Subscribe(
                     onNext: a =>
                     {
-                        imagesSource.Add(a.image);
+                        imagesSource.Add(new WebImage(a.imageResult, a.imageBytes, logger));
                         progress.Progress((double)(a.index + 1) / imageCountPerPage * 100);
                     },
                     onError: e =>
@@ -101,12 +108,22 @@ namespace ReactiveBingViewer.Models
                     });
         }
 
-
-        private async Task<WebImage> CreateWebImageAsync(Bing.ImageResult bingResult)
+        /// <summary>
+        /// Bing画像検索結果の画像情報に含まれるサムネイル画像のURLから画像データをダウンロードする
+        /// </summary>
+        /// <param name="imageResult">画像検索結果</param>
+        /// <returns>画像データのByte配列</returns>
+        private async Task<byte[]> DownloadThumbnailImageBytesAsync(Bing.ImageResult imageResult)
         {
-            var image = new WebImage(bingResult, logger);
-            await image.DownLoadThumbnailAsync();
-            return image;
+            try
+            {
+                return await BitmapImageHelper.DownLoadImageBytesAsync(imageResult.Thumbnail.MediaUrl);
+            }
+            catch (Exception e)
+            {
+                logger.Warn("サムネイル画像のダウンロードに失敗しました。", e);
+                return null;
+            }
         }
 
         /// <summary>
@@ -117,6 +134,6 @@ namespace ReactiveBingViewer.Models
             Cancel();
             Clear();
         }
-        
+
     }
 }

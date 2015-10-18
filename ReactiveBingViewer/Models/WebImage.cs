@@ -1,5 +1,4 @@
-﻿using Reactive.Bindings;
-using ReactiveBingViewer.Notifiers;
+﻿using ReactiveBingViewer.Notifiers;
 using System;
 using System.ComponentModel;
 using System.Globalization;
@@ -114,7 +113,7 @@ namespace ReactiveBingViewer.Models
         /// </summary>
         /// <param name="bingResult">Bing画像検索結果</param>
         /// <param name="logger">Logメッセージ通知オブジェクト</param>
-        public WebImage(Bing.ImageResult bingResult, ILogger logger)
+        public WebImage(Bing.ImageResult bingResult,byte[] thumbnail, ILogger logger)
         {
             if (bingResult == null) { throw new ArgumentNullException("bingResult"); }
 
@@ -122,28 +121,10 @@ namespace ReactiveBingViewer.Models
             this.MediaUrl = new Uri(bingResult.MediaUrl);
             this.sourceUrl = bingResult.SourceUrl;
             this.sourceTitle = bingResult.Title;
+            this.thumbnail = BitmapImageHelper.CreateBitmap(thumbnail);
             this.logger = logger ?? new EmptyLogger();
         }
-
-        /// <summary>
-        /// サムネイル画像をダウンロードします
-        /// </summary>
-        /// <returns>Task</returns>
-        public async Task DownLoadThumbnailAsync()
-        {
-            logger.Info(string.Format("サムネイル画像をダウンロードしています...[{0}]", this.MediaUrl.AbsoluteUri));
-            try
-            {
-                this.Thumbnail = await WebImageHelper.DownLoadImageAsync(bingResult.Thumbnail.MediaUrl,
-                    UIDispatcherScheduler.Default).ConfigureAwait(false);
-                logger.Info(string.Format("サムネイル画像のダウンロードが完了しました。[{0}]", this.MediaUrl.AbsoluteUri));
-            }
-            catch (Exception e)
-            {
-                logger.Warn(string.Format("サムネイル画像のダウンロードに失敗しました。[{0}]", this.MediaUrl.AbsoluteUri), e);
-                this.Thumbnail = null;
-            }
-        }
+               
 
         /// <summary>
         /// フルサイズの画像データをダウンロードします
@@ -155,8 +136,7 @@ namespace ReactiveBingViewer.Models
             logger.Info(string.Format("画像をダウンロードしています...[{0}]", this.MediaUrl.AbsoluteUri));
             try
             {
-                this.DisplayImage = await WebImageHelper.DownLoadImageAsync(this.MediaUrl.AbsoluteUri,
-                    Application.Current.Dispatcher).ConfigureAwait(false);
+                DisplayImage = await BitmapImageHelper.DownloadImageAsync(this.MediaUrl.AbsoluteUri, App.Current.Dispatcher);
                 logger.Info(string.Format("画像のダウンロードが完了しました。[{0}]", this.MediaUrl.AbsoluteUri));
             }
             catch (Exception e)
@@ -181,7 +161,7 @@ namespace ReactiveBingViewer.Models
             logger.Info(string.Format("画像を解析しています...[{0}]", this.MediaUrl.AbsoluteUri));
             try
             {
-                var result = await WebImageHelper.AnalyzeImageAsync(this.MediaUrl, subscriptionKey).ConfigureAwait(false);
+                var result = await ServiceClient.AnalyzeImageAsync(this.MediaUrl, subscriptionKey).ConfigureAwait(false);
                 this.ImageProperty = new ImageProperty(this.MediaUrl.AbsoluteUri, result);
 
                 logger.Info(string.Format("画像の解析が完了しました。[{0}]", this.MediaUrl.AbsoluteUri));

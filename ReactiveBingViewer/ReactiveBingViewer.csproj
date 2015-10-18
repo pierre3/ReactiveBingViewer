@@ -86,6 +86,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\ReturnKeyDownConverter.cs" />
+    <Compile Include="Models\BitmapImageHelper.cs" />
     <Compile Include="Notifiers\EmptyLogger.cs" />
     <Compile Include="Notifiers\LogMessageNotifier.cs" />
     <Compile Include="Notifiers\LogLevel.cs" />
@@ -93,7 +94,7 @@
     <Compile Include="Converters\SizeChangedToSizeConverter.cs" />
     <Compile Include="Models\ImageProperty.cs" />
     <Compile Include="Notifiers\ILogger.cs" />
-    <Compile Include="Models\WebImageHelper.cs" />
+    <Compile Include="Models\ServiceClient.cs" />
     <Compile Include="Models\WebImageStore.cs" />
     <Compile Include="Models\WebImage.cs" />
     <Compile Include="Notifiers\IProgressNotifier.cs" />
