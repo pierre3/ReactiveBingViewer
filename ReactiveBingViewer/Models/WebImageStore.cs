@@ -94,7 +94,48 @@ namespace ReactiveBingViewer.Models
                 .Subscribe(
                     onNext: a =>
                     {
-                        imagesSource.Add(new WebImage(a.imageResult, a.imageBytes, logger));
+                        var thumbnail = BitmapImageHelper.CreateBitmap(a.imageBytes);
+                        imagesSource.Add(new WebImage(a.imageResult, thumbnail, logger));
+                        progress.Progress((double)(a.index + 1) / imageCountPerPage * 100);
+                    },
+                    onError: e =>
+                    {
+                        logger.Error("画像の検索に失敗しました。", e);
+                    },
+                    onCompleted: () =>
+                    {
+                        logger.Info("検索が完了しました。");
+                        progress.Progress(100);
+                    });
+        }
+
+        /// <summary>
+        /// 指定した検索文字列でBing画像検索を行います(動作テスト用・同期版)
+        /// </summary>
+        public void DownloadSearchResultSync(string searchWord, IProgressNotifier progress, int page, int imageCountPerPage)
+        {
+            if (imageCountPerPage < 10)
+            {
+                throw new ArgumentException(nameof(imageCountPerPage) + " must be 10 or over.", nameof(imageCountPerPage));
+            }
+
+            logger.Info("検索中...");
+            progress.Start();
+            progress.Progress(0);
+
+            var skip = (page - 1) * imageCountPerPage;
+
+            disposable = ServiceClient.SearchImageAsObservable(searchWord, bingAccountKey, skip, imageCountPerPage, UIDispatcherScheduler.Default)
+                .SelectMany(async (Bing.ImageResult imageResult, int index) => new {
+                    index,
+                    imageResult,
+                    image = await BitmapImageHelper.CreateBitmapAsObservable(new Uri(imageResult.Thumbnail.MediaUrl))
+                })
+                .Finally(() => progress.End())
+                .Subscribe(
+                    onNext: a =>
+                    {
+                        imagesSource.Add(new WebImage(a.imageResult, a.image, logger));
                         progress.Progress((double)(a.index + 1) / imageCountPerPage * 100);
                     },
                     onError: e =>

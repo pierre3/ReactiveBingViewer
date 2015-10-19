@@ -113,7 +113,7 @@ namespace ReactiveBingViewer.Models
         /// </summary>
         /// <param name="bingResult">Bing画像検索結果</param>
         /// <param name="logger">Logメッセージ通知オブジェクト</param>
-        public WebImage(Bing.ImageResult bingResult,byte[] thumbnail, ILogger logger)
+        public WebImage(Bing.ImageResult bingResult, BitmapImage thumbnail, ILogger logger)
         {
             if (bingResult == null) { throw new ArgumentNullException("bingResult"); }
 
@@ -121,7 +121,7 @@ namespace ReactiveBingViewer.Models
             this.MediaUrl = new Uri(bingResult.MediaUrl);
             this.sourceUrl = bingResult.SourceUrl;
             this.sourceTitle = bingResult.Title;
-            this.thumbnail = BitmapImageHelper.CreateBitmap(thumbnail);
+            this.thumbnail = thumbnail;
             this.logger = logger ?? new EmptyLogger();
         }
                

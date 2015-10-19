@@ -86,13 +86,10 @@ namespace ReactiveBingViewer.Models
                     bitmap.BeginInit();
                     bitmap.UriSource = uri;
                     bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.DownloadCompleted += completed;
+                    bitmap.DownloadFailed += failed;
                     bitmap.EndInit();
-                    if (bitmap.IsDownloading)
-                    {
-                        bitmap.DownloadCompleted += completed;
-                        bitmap.DownloadFailed += failed;
-                    }
-                    else
+                    if (!bitmap.IsDownloading)
                     {
                         observer.OnNext(bitmap);
                         observer.OnCompleted();

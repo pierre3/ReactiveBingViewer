@@ -1,14 +1,14 @@
 ﻿using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 using ReactiveBingViewer.Models;
+using ReactiveBingViewer.Notifiers;
 using System;
+using System.Diagnostics;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Windows;
-using ReactiveBingViewer.Notifiers;
-using System.Windows.Media;
 using System.Threading.Tasks;
-using System.Diagnostics;
+using System.Windows;
+using System.Windows.Media;
 
 namespace ReactiveBingViewer.ViewModels
 {
