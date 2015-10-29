@@ -13,17 +13,17 @@ namespace ReactiveBingViewer.Notifiers
 
         public LogMessageNotifier() : base() { }
 
-        public void Trace(string message) => Report(new TraceLogMessage(message));
-        public void Debug(string message) => Report(new DebugLogMessage(message));
-        public void Info(string message) => Report(new InfoLogMessage(message));
-        public void Warn(string message) => Report(new WarnLogMessage(message));
-        public void Error(string message) => Report(new ErrorLogMessage(message));
-        public void Fatal(string message) => Report(new FatalLogMessage(message));
-        public void Trace(string message, Exception e) => Report(new TraceLogMessage(message, e));
-        public void Debug(string message, Exception e) => Report(new DebugLogMessage(message, e));
-        public void Info(string message, Exception e) => Report(new InfoLogMessage(message, e));
-        public void Warn(string message, Exception e) => Report(new WarnLogMessage(message, e));
-        public void Error(string message, Exception e) => Report(new ErrorLogMessage(message, e));
-        public void Fatal(string message, Exception e) => Report(new FatalLogMessage(message, e));
+        public void Trace(string message) => Report(LogMessage.CreateTraceLog(message));
+        public void Debug(string message) => Report(LogMessage.CreateDebugLog(message));
+        public void Info(string message) => Report(LogMessage.CreateInfoLog(message));
+        public void Warn(string message) => Report(LogMessage.CreateWarnLog(message));
+        public void Error(string message) => Report(LogMessage.CreateErrorLog(message));
+        public void Fatal(string message) => Report(LogMessage.CreateFatalLog(message));
+        public void Trace(string message, Exception e) => Report(LogMessage.CreateTraceLog(message, e));
+        public void Debug(string message, Exception e) => Report(LogMessage.CreateDebugLog(message, e));
+        public void Info(string message, Exception e) => Report(LogMessage.CreateInfoLog(message, e));
+        public void Warn(string message, Exception e) => Report(LogMessage.CreateWarnLog(message, e));
+        public void Error(string message, Exception e) => Report(LogMessage.CreateErrorLog(message, e));
+        public void Fatal(string message, Exception e) => Report(LogMessage.CreateFatalLog(message, e));
     }
 }
