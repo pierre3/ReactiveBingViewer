@@ -16,8 +16,8 @@ namespace ReactiveBingViewer.ViewModels
         private static readonly int imageCountPerPage = 50;
 
         private CompositeDisposable disposables = new CompositeDisposable();
-        public LogMessageNotifier logger = new LogMessageNotifier();
-        public ProgressNotifier progress = new ProgressNotifier();
+        private LogMessageNotifier logger = new LogMessageNotifier();
+        private ProgressNotifier progress = new ProgressNotifier();
         private WebImageStore webImageStore;
 
         /// <summary>[検索]コマンド</summary>
@@ -198,8 +198,8 @@ namespace ReactiveBingViewer.ViewModels
             ErrorLogsVisibility = ErrorLogs
                 .CollectionChangedAsObservable()
                 .Select(_ => (ErrorLogs.Count > 0) ? Visibility.Visible : Visibility.Collapsed)
-                .ToReactiveProperty(Visibility.Collapsed)
-                .AddTo(disposables);
+                .ToReactiveProperty(Visibility.Collapsed);
+                
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using ReactiveBingViewer.IO;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
 using System.Reactive.Linq;
@@ -48,66 +49,20 @@ namespace ReactiveBingViewer.Models
         /// <returns>BitmapImage</returns>
         public static BitmapImage CreateBitmap(byte[] bytes, bool freezing = true)
         {
-            using (var stream = new MemoryStream(bytes))
+            using (var stream = new WrappingStream(new MemoryStream(bytes)))
             {
                 var bitmap = new BitmapImage();
                 bitmap.BeginInit();
-                bitmap.StreamSource = new WrappingStream(stream);
+                bitmap.StreamSource = stream;
                 bitmap.CacheOption = BitmapCacheOption.OnLoad;
                 bitmap.EndInit();
+                bitmap.StreamSource = null;
                 if (freezing && bitmap.CanFreeze)
                 { bitmap.Freeze(); }
                 return bitmap;
             }
         }
-
-        /// <summary>
-        /// 画像URLからBitmapImageを生成するIObservable<T>を取得します
-        /// </summary>
-        /// <param name="uri">画像URL</param>
-        /// <returns>BitmapImageの生成を監視するIObservable<T></returns>
-        public static IObservable<BitmapImage> CreateBitmapAsObservable(Uri uri)
-        {
-            return Observable.Create<BitmapImage>(observer =>
-            {
-                EventHandler completed = (obj, __) =>
-                {
-                    var bi = (BitmapImage)obj;
-                    observer.OnNext(bi);
-                    observer.OnCompleted();
-                };
-                EventHandler<ExceptionEventArgs> failed = (_, e) =>
-                {
-                    observer.OnError(e.ErrorException);
-                };
-                var bitmap = new BitmapImage();
-                try
-                {
-                    bitmap.BeginInit();
-                    bitmap.UriSource = uri;
-                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                    bitmap.DownloadCompleted += completed;
-                    bitmap.DownloadFailed += failed;
-                    bitmap.EndInit();
-                    if (!bitmap.IsDownloading)
-                    {
-                        observer.OnNext(bitmap);
-                        observer.OnCompleted();
-                    }
-                }
-                catch (Exception e)
-                {
-                    observer.OnError(e);
-                }
-
-                return ()=> {
-                    bitmap.DownloadCompleted -= completed;
-                    bitmap.DownloadFailed -= failed;
-                    bitmap.Freeze();
-                };
-
-            });
-        }
+        
     }
 
 }

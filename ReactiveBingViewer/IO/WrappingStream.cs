@@ -178,6 +178,7 @@ namespace ReactiveBingViewer.IO
         {
             if (disposing)
             {
+                m_streamBase.Dispose();
                 m_streamBase = null;
             }
             base.Dispose(disposing);
