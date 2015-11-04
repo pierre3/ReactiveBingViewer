@@ -7,6 +7,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using ReactiveBingViewer.Diagnostics;
 
 namespace ReactiveBingViewer.Models
 {
@@ -51,6 +52,7 @@ namespace ReactiveBingViewer.Models
         {
             disposable.Dispose();
             logger.Info("検索をキャンセルしました");
+
         }
 
         /// <summary>

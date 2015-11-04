@@ -6,6 +6,7 @@ using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Windows;
+using System.Linq;
 
 namespace ReactiveBingViewer.ViewModels
 {
@@ -16,7 +17,8 @@ namespace ReactiveBingViewer.ViewModels
         private static readonly int imageCountPerPage = 50;
 
         private CompositeDisposable disposables = new CompositeDisposable();
-        private LogMessageNotifier logger = new LogMessageNotifier();
+        //private LogMessageNotifier logger = new LogMessageNotifier();
+        private EventSourceLogger logger = new EventSourceLogger();
         private ProgressNotifier progress = new ProgressNotifier();
         private WebImageStore webImageStore;
 
@@ -38,7 +40,9 @@ namespace ReactiveBingViewer.ViewModels
         public ReadOnlyReactiveProperty<string> StatusMessage { get; private set; }
 
         /// <summary>エラーログ一覧表示用コレクション</summary>
-        public ReadOnlyReactiveCollection<LogMessage> ErrorLogs { get; private set; }
+        //public ReadOnlyReactiveCollection<LogMessage> ErrorLogs { get; private set; }
+        public ReadOnlyReactiveCollection<string> ErrorLogs { get; private set; }
+
         /// <summary>エラーログ一覧の表示状態</summary>
         public ReactiveProperty<Visibility> ErrorLogsVisibility { get; private set; }
         /// <summary>エラー一覧のクリア</summary>
@@ -175,26 +179,36 @@ namespace ReactiveBingViewer.ViewModels
             //進捗率を通知
             PercentProgress = progress.PercentProgressObservable.ToReactiveProperty();
 
-            //Logファイルに書き出し
+            var logListner = EtwStream.ObservableEventListener.FromEventSource(logger.EventSource);
+
+            ////Logファイルに書き出し
             System.Diagnostics.Trace.Listeners.Add(new System.Diagnostics.TextWriterTraceListener("log.txt"));
-            logger.Subscribe(log =>
+            //logger.Subscribe(log =>
+            logListner.Subscribe(log =>
             {
                 System.Diagnostics.Trace.WriteLine(log);
                 System.Diagnostics.Trace.Flush();
             }).AddTo(disposables);
 
-            //Infoレベルのログはステータスバーに表示
-            StatusMessage = logger.Where(x => x.Level == LogLevel.Info)
-                .Select(x => x.Message)
+
+            ////Infoレベルのログはステータスバーに表示
+            //StatusMessage = logger.Where(x => x.Level == LogLevel.Info)
+            //    .Select(x => x.Message)
+            //    .ToReadOnlyReactiveProperty();
+            StatusMessage = logListner.Where(x => x.Level == System.Diagnostics.Tracing.EventLevel.Informational)
+                .Select(x => x.Payload.First().ToString())
                 .ToReadOnlyReactiveProperty();
 
-            //Warn レベル以上 は エラーリストに表示
+            ////Warn レベル以上 は エラーリストに表示
             ClearErrorLogsCommand = new ReactiveCommand();  //リストクリア用
-            ErrorLogs = logger
-                .Where(x => x.Level >= LogLevel.Warn)
+            //ErrorLogs = logger
+            //    .Where(x => x.Level >= LogLevel.Warn)
+            //    .ToReadOnlyReactiveCollection(ClearErrorLogsCommand.ToUnit());
+            ErrorLogs = logListner.Where(x => (int)x.Level <= (int)System.Diagnostics.Tracing.EventLevel.Warning)
+                .Select(x=>$"[{x.Level}]{x.Payload[0]} ({x.Payload[2]})")
                 .ToReadOnlyReactiveCollection(ClearErrorLogsCommand.ToUnit());
 
-            //エラーリスト表示切替。 ErrorLogs にアイテムがある場合のみ表示する
+            ////エラーリスト表示切替。 ErrorLogs にアイテムがある場合のみ表示する
             ErrorLogsVisibility = ErrorLogs
                 .CollectionChangedAsObservable()
                 .Select(_ => (ErrorLogs.Count > 0) ? Visibility.Visible : Visibility.Collapsed)
