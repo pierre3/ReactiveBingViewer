@@ -35,7 +35,7 @@ namespace ReactiveBingViewer.ViewModels
         /// <summary>検索の進捗率</summary>
         public ReactiveProperty<double> PercentProgress { get; private set; }
         /// <summary>ステータスバーに表示するメッセージ</summary>
-        public ReadOnlyReactiveProperty<LogMessage> StatusMessage { get; private set; }
+        public ReadOnlyReactiveProperty<string> StatusMessage { get; private set; }
 
         /// <summary>エラーログ一覧表示用コレクション</summary>
         public ReadOnlyReactiveCollection<LogMessage> ErrorLogs { get; private set; }
@@ -92,7 +92,7 @@ namespace ReactiveBingViewer.ViewModels
                 PageNumber.Value = 1;
                 SearchImage();
             }).AddTo(disposables);
-            
+
             //[キャンセル]コマンド
             //検索中の場合のみ実行可能
             CancelCommand = isProcessing.ToReactiveCommand();
@@ -185,12 +185,12 @@ namespace ReactiveBingViewer.ViewModels
 
             //Infoレベルのログはステータスバーに表示
             StatusMessage = logger.Where(x => x.Level == LogLevel.Info)
+                .Select(x => x.Message)
                 .ToReadOnlyReactiveProperty();
-            
+
             //Warn レベル以上 は エラーリストに表示
             ClearErrorLogsCommand = new ReactiveCommand();  //リストクリア用
             ErrorLogs = logger
-                .OfType<LogMessage>()
                 .Where(x => x.Level >= LogLevel.Warn)
                 .ToReadOnlyReactiveCollection(ClearErrorLogsCommand.ToUnit());
 
@@ -199,7 +199,7 @@ namespace ReactiveBingViewer.ViewModels
                 .CollectionChangedAsObservable()
                 .Select(_ => (ErrorLogs.Count > 0) ? Visibility.Visible : Visibility.Collapsed)
                 .ToReactiveProperty(Visibility.Collapsed);
-                
+
         }
 
         /// <summary>
@@ -218,7 +218,7 @@ namespace ReactiveBingViewer.ViewModels
         {
             disposables.Dispose();
         }
-     
+
     }
 }
 
